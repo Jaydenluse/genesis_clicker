@@ -1,18 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { MdOutlineArrowCircleRight } from "react-icons/md";
+import { MdOutlineArrowCircleRight, MdImage } from "react-icons/md";
 import { useGameContext } from '../components/Layout';
 import stars from '../images/stars.gif';
 import planet from '../images/planet.gif';
+import collector from '../images/better-collector.png'
+import magnet from '../images/magnet.png'
+import harvester from '../images/harvester.png'
 
 const GalacticCollector = () => {
   const { stardust, setStardust, clickPower, setClickPower, clickUpgradeCounts, setClickUpgradeCounts } = useGameContext();
   const [surgeActive, setSurgeActive] = useState(false);
   const [clickEffects, setClickEffects] = useState([]);
+  const [tooltipVisible, setTooltipVisible] = useState(null);
+  const tooltipTimeoutRef = useRef(null);
+
   const clickUpgrades = [
-    { name: 'Better Collector', power: 1, baseCost: 10 },
-    { name: 'Stardust Magnet', power: 5, baseCost: 100 },
-    { name: 'Quantum Harvester', power: 20, baseCost: 1000 },
+    { name: 'Better Collector', power: 1, baseCost: 10, image: collector },
+    { name: 'Stardust Magnet', power: 5, baseCost: 100, image: magnet },
+    { name: 'Quantum Harvester', power: 20, baseCost: 1000, image: harvester },
   ];
 
   const collectStardust = (e) => {
@@ -34,7 +40,7 @@ const GalacticCollector = () => {
     }, 1000);
   };
 
-  const buyClickUpgrade = (upgrade) => {
+const buyClickUpgrade = (upgrade) => {
     const count = clickUpgradeCounts[upgrade.name];
     const cost = Math.floor(upgrade.baseCost * Math.pow(1.15, count));
     if (stardust >= cost) {
@@ -46,6 +52,17 @@ const GalacticCollector = () => {
       setClickPower(prevPower => prevPower + upgrade.power);
     }
   };
+
+  const handleMouseEnter = useCallback((upgrade) => {
+    clearTimeout(tooltipTimeoutRef.current);
+    setTooltipVisible(upgrade.name);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    tooltipTimeoutRef.current = setTimeout(() => {
+      setTooltipVisible(null);
+    }, 300); // 300ms delay before hiding tooltip
+  }, []);
 
   return (
     <div className="height flex">
@@ -107,28 +124,61 @@ const GalacticCollector = () => {
       </div>
 
 
-      {/* Clicker Upgrades */}
-      <div className="w-64 bg-slate-950 p-4 overflow-y-auto font-mp">
-        <h2 className="text-2xl font-bold mb-4 text-white">Click Upgrades</h2>
-        {clickUpgrades.map((upgrade) => {
-          const count = clickUpgradeCounts[upgrade.name];
-          const cost = Math.floor(upgrade.baseCost * Math.pow(1.15, count));
-          return (
-            <div key={upgrade.name} className="mb-4 bg-gray-700 p-2 rounded">
-              <h3 className="text-lg font-semibold text-white">{upgrade.name}</h3>
-              <p className="text-sm text-gray-300">Power: +{upgrade.power}</p>
-              <p className="text-sm text-gray-300">Cost: {cost} Stardust</p>
-              <p className="text-sm text-gray-300">Owned: {count}</p>
-              <button
-                onClick={() => buyClickUpgrade(upgrade)}
-                disabled={stardust < cost}
-                className="mt-2 w-full py-1 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:bg-gray-500 disabled:cursor-not-allowed"
+      {/* Clicker Upgrades and Tooltip */}
+      <div className="w-64 bg-slate-950 p-4 font-mp flex flex-col relative">
+        <h2 className="text-2xl font-bold mb-4 text-white text-center">Click Upgrades</h2>
+        <div className="grid grid-cols-2 gap-4">
+          {clickUpgrades.map((upgrade) => {
+            const count = clickUpgradeCounts[upgrade.name];
+            const cost = Math.floor(upgrade.baseCost * Math.pow(1.15, count));
+            return (
+              <div 
+                key={upgrade.name} 
+                className="relative group flex justify-center items-center"
+                onMouseEnter={() => handleMouseEnter(upgrade)}
+                onMouseLeave={handleMouseLeave}
               >
-                Buy
-              </button>
-            </div>
-          );
-        })}
+                <button
+                  onClick={() => buyClickUpgrade(upgrade)}
+                  className="w-24 h-24 mt-2 rounded overflow-hidden focus:outline-none relative z-10"
+                  disabled={stardust < cost}
+                >
+                    <img 
+                      src={upgrade.image} 
+                      alt={upgrade.name} 
+                      className="w-full h-full object-cover object-center"
+                    /> 
+                </button>
+                <div className="absolute border border-sky-500 inset-0 h-28 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-200 rounded"></div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Tooltip Container */}
+        <div 
+          className={`absolute right-full top-0 m-2 w-48 bg-gray-800 p-2 rounded shadow-lg transition-all duration-200 ease-in-out ${
+            tooltipVisible ? 'opacity-100 visible' : 'opacity-0 invisible'
+          }`}
+          onMouseEnter={() => clearTimeout(tooltipTimeoutRef.current)}
+          onMouseLeave={handleMouseLeave}
+        >
+          {clickUpgrades.map((upgrade) => {
+            if (upgrade.name === tooltipVisible) {
+              const count = clickUpgradeCounts[upgrade.name];
+              const cost = Math.floor(upgrade.baseCost * Math.pow(1.15, count));
+              return (
+                <div key={upgrade.name} className="text-white">
+                  <h3 className="text-lg font-semibold">{upgrade.name}</h3>
+                  <p className="text-sm">Power: +{upgrade.power}</p>
+                  <p className="text-sm">Cost: {cost} Stardust</p>
+                  <p className="text-sm">Owned: {count}</p>
+                </div>
+              );
+            }
+            return null;
+          })}
+        </div>
       </div>
     </div>
   );

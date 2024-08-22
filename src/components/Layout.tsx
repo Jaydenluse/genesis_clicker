@@ -41,7 +41,7 @@ const Layout = () => {
     localStorage.setItem('upgradeCounts', JSON.stringify(upgradeCounts));
     localStorage.setItem('clickPower', clickPower.toString());
     localStorage.setItem('clickUpgradeCounts', JSON.stringify(clickUpgradeCounts));
-    // localStorage.clear(); Use this to start testing from 0
+    // localStorage.clear(); {/* Use to test from 0 */}
   }, [stardust, sps, upgradeCounts, clickPower, clickUpgradeCounts]);
 
   return (

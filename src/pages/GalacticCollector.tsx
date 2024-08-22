@@ -2,11 +2,7 @@ import React, { useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { MdOutlineArrowCircleRight, MdImage } from "react-icons/md";
 import { useGameContext } from '../components/Layout';
-import stars from '../images/stars.gif';
-import planet from '../images/planet.gif';
-import collector from '../images/better-collector.png'
-import magnet from '../images/magnet.png'
-import harvester from '../images/harvester.png'
+import { stars, planet, collector, magnet, harvester } from '../public/images';
 
 const GalacticCollector = () => {
   const { stardust, setStardust, clickPower, setClickPower, clickUpgradeCounts, setClickUpgradeCounts } = useGameContext();
@@ -99,7 +95,7 @@ const buyClickUpgrade = (upgrade) => {
               className="absolute pointer-events-none text-slate-950 font-bold text-2xl font-mp"
               style={{
                 left: `calc(50% + ${effect.x - 240}px)`,
-                top: `calc(50% + ${effect.y - 260}px)`,
+                top: `calc(50% + ${effect.y - 330}px)`,
                 animation: 'float-up 1s ease-out',
                 opacity: 0,
               }}

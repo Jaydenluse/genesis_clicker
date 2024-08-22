@@ -29,18 +29,6 @@ const Layout = () => {
     return saved ? JSON.parse(saved) : { 'Better Collector': 0, 'Stardust Magnet': 0, 'Quantum Harvester': 0 };
   });
 
-  const [localStardust, setLocalStardust] = useState(stardust);
-
-  const buyUpgrade = (upgrade) => {
-    const count = upgradeCounts[upgrade.name] || 0;
-    const cost = Math.floor(upgrade.baseCost * Math.pow(1.15, count));
-    if (localStardust >= cost) {
-      setLocalStardust(prev => prev - cost);
-      setSps(prev => prev + upgrade.sps);
-      setUpgradeCounts(prev => ({ ...prev, [upgrade.name]: (prev[upgrade.name] || 0) + 1 }));
-    }
-  };
-
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -49,10 +37,6 @@ const Layout = () => {
     { path: '/upgrades', icon: LuArrowUpCircle, label: 'Upgrades' },
     { path: '/knowledge', icon: GiBrain, label: 'Knowledge' },
   ];
-
-  useEffect(() => {
-    setLocalStardust(stardust);
-  }, [stardust]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -67,12 +51,21 @@ const Layout = () => {
     localStorage.setItem('upgradeCounts', JSON.stringify(upgradeCounts));
     localStorage.setItem('clickPower', clickPower.toString());
     localStorage.setItem('clickUpgradeCounts', JSON.stringify(clickUpgradeCounts));
-    localStorage.clear();
   }, [stardust, sps, upgradeCounts, clickPower, clickUpgradeCounts]);
 
-  useEffect(() => { //Resets scroll
+  useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
+
+  const buyUpgrade = (upgrade) => {
+    const count = upgradeCounts[upgrade.name] || 0;
+    const cost = Math.floor(upgrade.baseCost * Math.pow(1.15, count));
+    if (stardust >= cost) {
+      setStardust(prevStardust => prevStardust - cost);
+      setSps(prevSps => prevSps + upgrade.sps);
+      setUpgradeCounts(prev => ({ ...prev, [upgrade.name]: (prev[upgrade.name] || 0) + 1 }));
+    }
+  };
 
   return (
     <GameContext.Provider value={{ 
@@ -86,8 +79,6 @@ const Layout = () => {
       setClickPower,
       clickUpgradeCounts,
       setClickUpgradeCounts,
-      localStardust,
-      setLocalStardust,
       buyUpgrade,
     }}>
 

@@ -5,6 +5,7 @@
 html, body {
   @apply bg-black;
   min-height: 100vh;
+  user-select: none;
 }
 
 .no-scroll {

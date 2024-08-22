@@ -3,9 +3,10 @@ import { LuAtom, LuDna, LuDroplet, LuScissors, LuZap, LuPackage, LuInfo, LuCircl
 import { TbCircles } from "react-icons/tb";
 import { MdLockOpen, MdLockOutline } from "react-icons/md";
 import { useGameContext } from '../components/Layout';
+import { aminoAcid, nucleotide } from '../public/images';
 
 const UpgradeSection = ({ title, upgrades, tierLevel, unlockCondition, tooltipText }) => {
-  const { localStardust, buyUpgrade, upgradeCounts } = useGameContext();
+  const { stardust, buyUpgrade, upgradeCounts } = useGameContext();
 
   const isUnlocked = unlockCondition(upgradeCounts);
 
@@ -25,23 +26,30 @@ const UpgradeSection = ({ title, upgrades, tierLevel, unlockCondition, tooltipTe
           const count = upgradeCounts[upgrade.name] || 0;
           const cost = Math.floor(upgrade.baseCost * Math.pow(1.15, count));
           const isUpgradeUnlocked = upgrade.unlockCondition ? upgrade.unlockCondition(upgradeCounts) : true;
+          const canBuy = stardust >= cost && isUpgradeUnlocked;
 
           return (
-            <div key={upgrade.name} className={`bg-gray-800 p-4 rounded-lg flex flex-col items-center relative ${isUpgradeUnlocked ? '' : 'opacity-50'}`}>
+            <div 
+              key={upgrade.name} 
+              onClick={() => canBuy && buyUpgrade(upgrade)}
+              className={`
+                bg-gray-900 p-4 rounded-lg flex flex-col items-center relative
+                ${canBuy ? 'cursor-pointer hover:bg-gray-800 active:bg-gray-600 transform active:scale-95 transition-all duration-100' : 'opacity-50 cursor-not-allowed'}
+              `}
+            >
               <div className="absolute top-2 right-2 bg-gray-700 rounded-full w-6 h-6 flex items-center justify-center">
                 <span className="text-xs font-bold">{count}</span>
               </div>
-              <upgrade.icon size={32} className="mb-2" />
+              <div className="w-16 h-16 mb-2 flex items-center justify-center">
+                {upgrade.image ? (
+                  <img src={upgrade.image} alt={upgrade.name} className="w-full h-full object-contain" />
+                ) : (
+                  <upgrade.icon size={32} />
+                )}
+              </div>
               <span className="text-xl font-bold font-mp">{upgrade.name}</span>
               <span className="text-base font-mp">Cost: {cost} Stardust</span>
               <span className="text-base font-mp">+{upgrade.sps} SPS</span>
-              <button
-                onClick={() => buyUpgrade(upgrade)}
-                disabled={localStardust < cost || !isUpgradeUnlocked}
-                className="mt-2 font-mp bg-purple-600 hover:bg-purple-800 text-white font-bold py-1 px-2 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Buy
-              </button>
             </div>
           );
         })}
@@ -51,15 +59,16 @@ const UpgradeSection = ({ title, upgrades, tierLevel, unlockCondition, tooltipTe
 };
 
 const UpgradeTree = () => {
-  const { stardust, setStardust, sps, setSps, upgradeCounts, setUpgradeCounts } = useGameContext();
-  const [localStardust, setLocalStardust] = useState(stardust);
+  const { stardust, upgradeCounts } = useGameContext();
+
+
 
   const upgradeTiers = [
     {
       title: "Basic Building Blocks",
       upgrades: [
-        { name: 'Amino Acids', icon: LuAtom, baseCost: 15, sps: 1 },
-        { name: 'Nucleotides', icon: LuDna, baseCost: 100, sps: 5 },
+        { name: 'Amino Acids', icon: LuAtom, baseCost: 15, sps: 1, image: aminoAcid },
+        { name: 'Nucleotides', icon: LuDna, baseCost: 100, sps: 5, image: nucleotide },
         { name: 'Lipids', icon: LuDroplet, baseCost: 1100, sps: 25 },
       ],
       unlockCondition: () => true,
@@ -86,27 +95,6 @@ const UpgradeTree = () => {
       tooltipText: "Requires 10 of each Advanced Structure"
     }
   ];
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setLocalStardust(prevStardust => prevStardust + sps / 10);
-    }, 100);
-    return () => clearInterval(timer);
-  }, [sps]);
-
-  useEffect(() => {
-    setStardust(Math.floor(localStardust));
-  }, [localStardust, setStardust]);
-
-  const buyUpgrade = (upgrade) => {
-    const count = upgradeCounts[upgrade.name] || 0;
-    const cost = Math.floor(upgrade.baseCost * Math.pow(1.15, count));
-    if (localStardust >= cost) {
-      setLocalStardust(prev => prev - cost);
-      setSps(prev => prev + upgrade.sps);
-      setUpgradeCounts(prev => ({ ...prev, [upgrade.name]: (prev[upgrade.name] || 0) + 1 }));
-    }
-  };
 
   return (
     <div className="h-full flex flex-col">

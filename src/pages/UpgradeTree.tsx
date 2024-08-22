@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { LuAtom, LuDna, LuDroplet, LuScissors, LuZap, LuPackage, LuInfo } from 'react-icons/lu';
-import { MdOutlineArrowCircleLeft, MdLockOpen, MdLockOutline } from "react-icons/md";
+import { MdLockOpen, MdLockOutline } from "react-icons/md";
 import { useGameContext } from '../components/Layout';
 
 const UpgradeTree = () => {
@@ -75,14 +74,6 @@ const UpgradeTree = () => {
 
   return (
     <div className="h-full px-5 overflow-auto">
-      {/* Back To Main */}
-      <Link 
-        to="/" 
-        className="ml-6 mt-4 inline-block text-white hover:text-light-blue transition-all duration-300 ease-in-out transform hover:-translate-x-1"
-        aria-label="Back to Game"
-      >
-        <MdOutlineArrowCircleLeft size={32} />
-      </Link>
 
       {/* Building Block Upgrades */}
       <div className="bg-gray-700 p-4 rounded-lg mt-3 mb-6 relative">

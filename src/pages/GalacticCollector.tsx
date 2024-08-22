@@ -108,19 +108,6 @@ const buyClickUpgrade = (upgrade) => {
             </div>
           ))}
         </div>
-
-        {/* Upgrades Arrow Link with Tooltip */}
-        <div className="absolute bottom-4 right-4 z-50">
-          <div className="group relative">
-            <Link 
-              to="/upgrades" 
-              className="inline-block text-white hover:text-light-blue transition-all duration-300 ease-in-out transform hover:translate-x-1"
-              aria-label="View Upgrades"
-            >
-              <MdOutlineArrowCircleRight size={32} />
-            </Link>
-          </div>
-        </div>
       </div>
 
 

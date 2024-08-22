@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
-import { LuStar, LuRocket } from 'react-icons/lu';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { LuStar, LuRocket, LuHome, LuArrowUpCircle } from 'react-icons/lu';
 
 const GameContext = createContext(null);
 
@@ -28,6 +28,9 @@ const Layout = () => {
     return saved ? JSON.parse(saved) : { 'Better Collector': 0, 'Stardust Magnet': 0, 'Quantum Harvester': 0 };
   });
 
+  const navigate = useNavigate();
+  const location = useLocation();
+
   useEffect(() => {
     const timer = setInterval(() => {
       setStardust(prevStardust => prevStardust + sps / 10);
@@ -41,7 +44,6 @@ const Layout = () => {
     localStorage.setItem('upgradeCounts', JSON.stringify(upgradeCounts));
     localStorage.setItem('clickPower', clickPower.toString());
     localStorage.setItem('clickUpgradeCounts', JSON.stringify(clickUpgradeCounts));
-    // localStorage.clear(); {/* Use to test from 0 */}
   }, [stardust, sps, upgradeCounts, clickPower, clickUpgradeCounts]);
 
   return (
@@ -52,7 +54,7 @@ const Layout = () => {
       clickPower, setClickPower,
       clickUpgradeCounts, setClickUpgradeCounts
     }}>
-      <div className="min-h-screen bg-slate-950 text-white">
+      <div className="min-h-screen bg-slate-950 text-white flex flex-col">
         <header className="bg-slate-950 p-6 flex justify-between items-center">
           <div className="flex items-center">
             <LuStar className="inline-block mr-2 text-yellow-400" />
@@ -63,9 +65,32 @@ const Layout = () => {
             <span className='font-mp text-xl'>{sps.toFixed(1)} SPS</span>
           </div>
         </header>
-        <main>
+        <main className="flex-grow relative">
           <Outlet />
         </main>
+        <div className="fixed bottom-4 right-4 flex space-x-2 z-50">
+          <button
+            onClick={() => navigate('/')}
+            className={`p-2 rounded-full ${location.pathname === '/' ? 'bg-blue-600' : 'bg-gray-700'} hover:bg-blue-500 transition-colors`}
+            aria-label="Home"
+          >
+            <LuHome size={24} />
+          </button>
+          <button
+            onClick={() => navigate('/upgrades')}
+            className={`p-2 rounded-full ${location.pathname === '/upgrades' ? 'bg-blue-600' : 'bg-gray-700'} hover:bg-blue-500 transition-colors`}
+            aria-label="Upgrades"
+          >
+            <LuArrowUpCircle size={24} />
+          </button>
+          <button
+            onClick={() => navigate('/skills')}
+            className={`p-2 rounded-full ${location.pathname === '/upgrades' ? 'bg-blue-600' : 'bg-gray-700'} hover:bg-blue-500 transition-colors`}
+            aria-label="Skills"
+          >
+            <LuArrowUpCircle size={24} />
+          </button>
+        </div>
       </div>
     </GameContext.Provider>
   );

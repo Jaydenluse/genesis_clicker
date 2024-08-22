@@ -15,7 +15,7 @@ const UpgradeSection = ({ title, upgrades, tierLevel, unlockCondition, tooltipTe
       
       <div className="absolute top-2 right-2 group">
         <LuInfo size={18} className="text-blue-400 cursor-help" />
-        <div className="absolute hidden group-hover:block -bottom-8 right-6 mb-2 w-48 p-2 bg-gray-800 text-white text-sm rounded-lg shadow-lg">
+        <div className="absolute hidden font-mp group-hover:block -bottom-8 right-6 mb-2 w-48 p-2 bg-gray-800 text-white text-sm rounded-lg shadow-lg">
           {tooltipText}
         </div>
       </div>
@@ -63,7 +63,7 @@ const UpgradeTree = () => {
         { name: 'Lipids', icon: LuDroplet, baseCost: 1100, sps: 25 },
       ],
       unlockCondition: () => true,
-      tooltipText: "Fundamental components of life"
+      tooltipText: "Next tier requires 10 of each Basic Building Block"
     },
     {
       title: "Advanced Structures",
@@ -73,7 +73,7 @@ const UpgradeTree = () => {
         { name: 'Vesicles', icon: LuPackage, baseCost: 200000, sps: 8000 },
       ],
       unlockCondition: (counts) => ['Amino Acids', 'Nucleotides', 'Lipids'].every(u => (counts[u] || 0) >= 10),
-      tooltipText: "Requires 10 of each Basic Building Block"
+      tooltipText: "Next tier requires 10 of each Advanced Structure"
     },
     {
       title: "Complex Life Systems",
@@ -122,7 +122,10 @@ const UpgradeTree = () => {
             />
             {index < upgradeTiers.length - 1 && (
               <div className='flex justify-center my-2'>
-                {tier.unlockCondition(upgradeCounts) ? <MdLockOpen size={32} /> : <MdLockOutline size={32} />}
+                {index === 0 
+                  ? (upgradeTiers[1].unlockCondition(upgradeCounts) ? <MdLockOpen size={32} /> : <MdLockOutline size={32} />)
+                  : (tier.unlockCondition(upgradeCounts) ? <MdLockOpen size={32} /> : <MdLockOutline size={32} />)
+                }
               </div>
             )}
           </React.Fragment>

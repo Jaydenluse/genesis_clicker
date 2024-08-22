@@ -15,7 +15,7 @@ const App = () => {
           <Route element={<Layout />}>
             <Route path="/" element={<GalacticCollector />} />
             <Route path="/upgrades" element={<UpgradeTree />} />
-            <Route path='/skills' element={<SkillTree />} />
+            <Route path='/knowledge' element={<SkillTree />} />
           </Route>
         </Routes>
       </NoScrollWrapper>

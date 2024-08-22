@@ -83,7 +83,7 @@ const buyClickUpgrade = (upgrade) => {
           <div className="absolute inset-0 flex items-center justify-center">
             <button
               onClick={collectStardust}
-              className="w-[480px] h-[480px] rounded-full overflow-hidden focus:outline-none clicker"
+              className="w-[480px] h-[480px] rounded-full overflow-hidden mb-36 focus:outline-none clicker"
               style={{ 
                 backgroundImage: `url(${planet})`,
                 backgroundSize: 'cover',

@@ -44,6 +44,16 @@ const Layout = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const navButtons = [
+    { path: '/', icon: LuHome, label: 'Home' },
+    { path: '/upgrades', icon: LuArrowUpCircle, label: 'Upgrades' },
+    { path: '/knowledge', icon: GiBrain, label: 'Knowledge' },
+  ];
+
+  useEffect(() => {
+    setLocalStardust(stardust);
+  }, [stardust]);
+
   useEffect(() => {
     const timer = setInterval(() => {
       setStardust(prevStardust => prevStardust + sps / 10);
@@ -57,21 +67,33 @@ const Layout = () => {
     localStorage.setItem('upgradeCounts', JSON.stringify(upgradeCounts));
     localStorage.setItem('clickPower', clickPower.toString());
     localStorage.setItem('clickUpgradeCounts', JSON.stringify(clickUpgradeCounts));
+    localStorage.clear();
   }, [stardust, sps, upgradeCounts, clickPower, clickUpgradeCounts]);
+
+  useEffect(() => { //Resets scroll
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   return (
     <GameContext.Provider value={{ 
-      stardust, setStardust, 
-      sps, setSps, 
-      upgradeCounts, setUpgradeCounts,
-      clickPower, setClickPower,
-      clickUpgradeCounts, setClickUpgradeCounts,
+      stardust,
+      setStardust, 
+      sps,
+      setSps, 
+      upgradeCounts,
+      setUpgradeCounts,
+      clickPower,
+      setClickPower,
+      clickUpgradeCounts,
+      setClickUpgradeCounts,
       localStardust,
       setLocalStardust,
       buyUpgrade,
     }}>
+
+
       <div className="min-h-screen bg-slate-950 text-white flex flex-col">
-        <header className="bg-slate-950 p-6 flex justify-between items-center">
+        <header className="bg-slate-950 p-6 flex justify-between items-center sticky top-0 z-40 shadow-md">
           <div className="flex items-center">
             <LuStar className="inline-block mr-2 text-yellow-400" />
             <span className="font-mp text-xl font-bold">{Math.floor(stardust)} Stardust</span>
@@ -81,32 +103,29 @@ const Layout = () => {
             <span className='font-mp text-xl'>{sps.toFixed(1)} SPS</span>
           </div>
         </header>
-        <main className="flex-grow relative">
+        <main className="flex-grow overflow-auto pb-16">
           <Outlet />
         </main>
-        <div className="fixed bottom-4 right-4 flex space-x-2 z-50">
-          <button
-            onClick={() => navigate('/')}
-            className={`p-2 rounded-full ${location.pathname === '/' ? 'bg-blue-600' : 'bg-gray-700'} hover:bg-blue-500 transition-colors`}
-            aria-label="Home"
-          >
-            <LuHome size={24} />
-          </button>
-          <button
-            onClick={() => navigate('/upgrades')}
-            className={`p-2 rounded-full ${location.pathname === '/upgrades' ? 'bg-blue-600' : 'bg-gray-700'} hover:bg-blue-500 transition-colors`}
-            aria-label="Upgrades"
-          >
-            <LuArrowUpCircle size={24} />
-          </button>
-          <button
-            onClick={() => navigate('/skills')}
-            className={`p-2 rounded-full ${location.pathname === '/skills' ? 'bg-blue-600' : 'bg-gray-700'} hover:bg-blue-500 transition-colors`}
-            aria-label="Skills"
-          >
-            <GiBrain size={24} />
-          </button>
-        </div>
+
+
+        <footer className="fixed bottom-0 left-0 right-0 bg-slate-950 p-4 shadow-inner z-50">
+          <div className="flex justify-center space-x-4">
+            {navButtons.map((button) => (
+              <div key={button.path} className="relative group">
+                <button
+                  onClick={() => navigate(button.path)}
+                  className={`p-2 rounded-full ${location.pathname === button.path ? 'bg-blue-600' : 'bg-gray-700'} hover:bg-blue-500 transition-colors`}
+                  aria-label={button.label}
+                >
+                  <button.icon size={24} />
+                </button>
+                <div className="absolute font-mp bg-opacity-60 bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                  {button.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </footer>
       </div>
     </GameContext.Provider>
   );

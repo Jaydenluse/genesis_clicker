@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { LuStar, LuRocket, LuHome, LuArrowUpCircle } from 'react-icons/lu';
+import { GiBrain } from "react-icons/gi";
 
 const GameContext = createContext(null);
 
@@ -85,10 +86,10 @@ const Layout = () => {
           </button>
           <button
             onClick={() => navigate('/skills')}
-            className={`p-2 rounded-full ${location.pathname === '/upgrades' ? 'bg-blue-600' : 'bg-gray-700'} hover:bg-blue-500 transition-colors`}
+            className={`p-2 rounded-full ${location.pathname === '/skills' ? 'bg-blue-600' : 'bg-gray-700'} hover:bg-blue-500 transition-colors`}
             aria-label="Skills"
           >
-            <LuArrowUpCircle size={24} />
+            <GiBrain size={24} />
           </button>
         </div>
       </div>

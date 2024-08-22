@@ -27,7 +27,7 @@ const initialEdges = [
 
 const SkillTree = () => {
   return (
-    <div className="w-screen h-screen overflow-hidden bg-gray-900 flex flex-col">
+    <div className="w-screen h-screen overflow-hidden bg-gray-900 flex flex-col no-scroll">
       <div className="flex-grow relative">
         <ReactFlow
           nodes={initialNodes}

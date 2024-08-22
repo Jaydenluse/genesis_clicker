@@ -5,3 +5,4 @@
  - Eventually add different currency besides stardust
  - Figure out a skill tree? Critical hits, speed boosts, idle clickers/workers. etc. 
  - Maybe skills are bought through amounts of clicks or a different 'currency'
+ - freeze layout header to top of the screen.

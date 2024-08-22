@@ -29,6 +29,18 @@ const Layout = () => {
     return saved ? JSON.parse(saved) : { 'Better Collector': 0, 'Stardust Magnet': 0, 'Quantum Harvester': 0 };
   });
 
+  const [localStardust, setLocalStardust] = useState(stardust);
+
+  const buyUpgrade = (upgrade) => {
+    const count = upgradeCounts[upgrade.name] || 0;
+    const cost = Math.floor(upgrade.baseCost * Math.pow(1.15, count));
+    if (localStardust >= cost) {
+      setLocalStardust(prev => prev - cost);
+      setSps(prev => prev + upgrade.sps);
+      setUpgradeCounts(prev => ({ ...prev, [upgrade.name]: (prev[upgrade.name] || 0) + 1 }));
+    }
+  };
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -53,7 +65,10 @@ const Layout = () => {
       sps, setSps, 
       upgradeCounts, setUpgradeCounts,
       clickPower, setClickPower,
-      clickUpgradeCounts, setClickUpgradeCounts
+      clickUpgradeCounts, setClickUpgradeCounts,
+      localStardust,
+      setLocalStardust,
+      buyUpgrade,
     }}>
       <div className="min-h-screen bg-slate-950 text-white flex flex-col">
         <header className="bg-slate-950 p-6 flex justify-between items-center">

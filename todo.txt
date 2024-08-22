@@ -1,0 +1,7 @@
+ - Add shaking animation to planet when clicked
+ - Add different icons/logos for clicker upgrades and upgrade shop?
+ - Add more upgrades
+ - As upgrades progress the planet should also progress. Water, plant life, civilization, etc.
+ - Eventually add different currency besides stardust
+ - Figure out a skill tree? Critical hits, speed boosts, idle clickers/workers. etc. 
+ - Maybe skills are bought through amounts of clicks or a different 'currency'

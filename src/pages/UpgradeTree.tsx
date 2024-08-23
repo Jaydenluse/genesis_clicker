@@ -3,6 +3,7 @@ import { LuInfo } from 'react-icons/lu';
 import { MdLockOpen, MdLockOutline } from "react-icons/md";
 import { useGameContext } from '../components/Layout';
 import { aminoAcid, nucleotide, lipid, rna, enzymes, vesicles, prokaryotic, eukaryotic, multicellular, fungi, plants, animals, human } from '../public/images';
+import DifficultyModal from '../components/DifficultyModal';
 
 const UpgradeSection = ({ title, upgrades, unlockCondition, tooltipText, isUnique }) => {
   const { stardust, buyUpgrade, upgradeCounts } = useGameContext();
@@ -60,8 +61,14 @@ const UpgradeSection = ({ title, upgrades, unlockCondition, tooltipText, isUniqu
 };
 
 const UpgradeTree = () => {
-  const { stardust, upgradeCounts } = useGameContext();
+  const { upgradeCounts, sps} = useGameContext();
+  const [showDifficultyModal, setShowDifficultyModal] = useState(false);
 
+  useEffect(() => {
+    if (sps === 0) {
+      setShowDifficultyModal(true);
+    }
+  }, [sps]);
 
 
   const upgradeTiers = [
@@ -139,6 +146,12 @@ const UpgradeTree = () => {
           </React.Fragment>
         ))}
       </div>
+
+      <DifficultyModal 
+        isOpen={showDifficultyModal}
+        onClose={() => setShowDifficultyModal(false)}
+      />
+
     </div>
   );
 };

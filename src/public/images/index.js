@@ -1,5 +1,6 @@
 import stars from './stars.gif';
 import planet from './planet.gif';
+import waterplanet from './water-planet.gif';
 import collector from './better-collector.png';
 import magnet from './magnet.png';
 import harvester from './harvester.png';
@@ -17,6 +18,6 @@ import plants from './plants.png';
 import animals from './animals.png';
 import human from './human.png';
 
-export { stars, planet, collector, magnet, harvester, aminoAcid,
+export { stars, planet, waterplanet, collector, magnet, harvester, aminoAcid,
      nucleotide, lipid, rna, enzymes, vesicles, prokaryotic, 
      eukaryotic, multicellular, fungi, plants, animals, human };

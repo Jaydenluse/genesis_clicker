@@ -1,8 +1,9 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { LuStar, LuRocket, LuHome, LuArrowUpCircle } from 'react-icons/lu';
 import { GiBrain } from "react-icons/gi";
 import { MdLock } from "react-icons/md";
+import Modal from './Modal';
 
 const GameContext = createContext(null);
 
@@ -29,6 +30,10 @@ const Layout = () => {
     const saved = localStorage.getItem('clickUpgradeCounts');
     return saved ? JSON.parse(saved) : { 'Better Collector': 0, 'Stardust Magnet': 0, 'Quantum Harvester': 0 };
   });
+  const [showOfflineModal, setShowOfflineModal] = useState(false);
+  const [offlineStardust, setOfflineStardust] = useState(0);
+  const [showHumanUpgradeModal, setShowHumanUpgradeModal] = useState(false);
+
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -45,11 +50,56 @@ const Layout = () => {
     },
   ];
 
+  const lastUpdateRef = useRef(Date.now());
+
+  // Idling logic
+  const calculateOfflineProgress = () => {
+    const now = Date.now();
+    const lastUpdate = parseInt(localStorage.getItem('lastUpdate') || '0', 10);
+    const storedSps = parseFloat(localStorage.getItem('sps') || '0');
+    const elapsedSeconds = (now - lastUpdate) / 1000;
+
+    if (elapsedSeconds > 5) {  // Threshold for showing modal
+      const earnedStardust = elapsedSeconds * storedSps;
+      setStardust(prevStardust => {
+        const newStardust = prevStardust + earnedStardust;
+        return newStardust;
+      });
+      setOfflineStardust(earnedStardust);
+      setShowOfflineModal(true);
+    } else {
+      console.log('Not enough time has passed for offline progress');
+    }
+
+    localStorage.setItem('lastUpdate', now.toString());
+  };
+
   useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        calculateOfflineProgress();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    calculateOfflineProgress();
+
     const timer = setInterval(() => {
-      setStardust(prevStardust => prevStardust + sps / 10);
+      if (!document.hidden) {
+        setStardust(prevStardust => {
+          const newStardust = prevStardust + sps / 10;
+          localStorage.setItem('stardust', newStardust.toString());
+          localStorage.setItem('lastUpdate', Date.now().toString());
+          return newStardust;
+        });
+      }
     }, 100);
-    return () => clearInterval(timer);
+
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, [sps]);
 
   useEffect(() => {
@@ -73,6 +123,10 @@ const Layout = () => {
       setSps(prevSps => prevSps + upgrade.sps);
       setUpgradeCounts(prev => ({ ...prev, [upgrade.name]: (prev[upgrade.name] || 0) + 1 }));
     }
+
+    if (upgrade.name === 'Human' && count === 0) {
+      setShowHumanUpgradeModal(true);
+    }
   };
 
   const handleNavigation = (path, locked) => {
@@ -95,8 +149,6 @@ const Layout = () => {
       setClickUpgradeCounts,
       buyUpgrade,
     }}>
-
-
       <div className="min-h-screen bg-slate-950 text-white flex flex-col">
         <header className="bg-slate-950 p-6 flex justify-between items-center sticky top-0 z-40 shadow-md">
           <div className="flex items-center">
@@ -133,6 +185,27 @@ const Layout = () => {
             ))}
           </div>
         </footer>
+
+        <Modal 
+          isOpen={showOfflineModal}
+          onClose={() => setShowOfflineModal(false)}
+          title="Welcome Back!"
+          content="While you were away, you collected:"
+          icon="star"
+          value={offlineStardust.toFixed(2)}
+          subtext="Stardust"
+          actionText="Continue"
+        />
+
+        <Modal 
+          isOpen={showHumanUpgradeModal}
+          onClose={() => setShowHumanUpgradeModal(false)}
+          title="Congratulations!"
+          content="You have unlocked human knowledge!"
+          icon="brain"
+          subtext="The Knowledge tab is now available"
+          actionText="Explore Knowledge"
+        />
       </div>
     </GameContext.Provider>
   );

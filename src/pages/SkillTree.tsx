@@ -44,8 +44,7 @@ const SkillTree = () => {
           defaultViewport={{ zoom: 1, x: 0, y: 0 }}
         >
           <Background color="#aaa" gap={16} />
-          <Controls />
-          <MiniMap />
+          <Controls className='absolute'/>
         </ReactFlow>
       </div>
     </div>

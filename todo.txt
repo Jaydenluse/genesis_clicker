@@ -1,8 +1,10 @@
- - Add shaking animation to planet when clicked
- - Add different icons/logos for clicker upgrades and upgrade shop?
- - Add more upgrades
- - As upgrades progress the planet should also progress. Water, plant life, civilization, etc.
- - Eventually add different currency besides stardust
- - Figure out a skill tree? Critical hits, speed boosts, idle clickers/workers. etc. 
- - Maybe skills are bought through amounts of clicks or a different 'currency'
- - freeze layout header to top of the screen.
+ - Add shaking animation to planet when clicked. []
+ - Add different icons/logos for clicker upgrades and upgrade shop? [X]
+ - Add more upgrades [X]
+ - As upgrades progress the planet should also progress. Water, plant life, civilization, etc. []
+ - Eventually add different currency besides stardust. []
+ - Figure out a skill tree? Critical hits, speed boosts, idle clickers/workers. etc. []
+ - freeze layout header to top of the screen. [X]
+ - add menu before buying upgrades to choose difficulty. (buffs for playing on higher difficulties) []
+ - lock knowledge until human is unlocked. [X]
+ - ADD IDLE SPS. []

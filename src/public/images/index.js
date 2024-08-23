@@ -5,5 +5,18 @@ import magnet from './magnet.png';
 import harvester from './harvester.png';
 import aminoAcid from './amino-acid.png';
 import nucleotide from './nucleotide.png';
+import lipid from './lipid.png';
+import rna from './rna.png';
+import enzymes from './enzymes.png';
+import vesicles from './vesicles.png';
+import prokaryotic from './prokaryotic.png';
+import eukaryotic from './eukaryotic.png';
+import multicellular from './multicellular.png';
+import fungi from './fungi.png';
+import plants from './plants.png';
+import animals from './animals.png';
+import human from './human.png';
 
-export { stars, planet, collector, magnet, harvester, aminoAcid, nucleotide };
+export { stars, planet, collector, magnet, harvester, aminoAcid,
+     nucleotide, lipid, rna, enzymes, vesicles, prokaryotic, 
+     eukaryotic, multicellular, fungi, plants, animals, human };

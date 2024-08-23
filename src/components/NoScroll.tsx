@@ -6,7 +6,7 @@ const NoScrollWrapper = ({ children }) => {
   const [isNoScroll, setIsNoScroll] = useState(false);
 
   useEffect(() => {
-    const noScrollRoutes = ['/', '/skills'];
+    const noScrollRoutes = ['/', '/knowledge'];
     setIsNoScroll(noScrollRoutes.includes(location.pathname));
   }, [location]);
 

@@ -2,6 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { LuStar, LuRocket, LuHome, LuArrowUpCircle } from 'react-icons/lu';
 import { GiBrain } from "react-icons/gi";
+import { MdLock } from "react-icons/md";
 
 const GameContext = createContext(null);
 
@@ -31,11 +32,17 @@ const Layout = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const isKnowledgeUnlocked = upgradeCounts['Human'] && upgradeCounts['Human'] > 0;
 
   const navButtons = [
     { path: '/', icon: LuHome, label: 'Home' },
     { path: '/upgrades', icon: LuArrowUpCircle, label: 'Upgrades' },
-    { path: '/knowledge', icon: GiBrain, label: 'Knowledge' },
+    { 
+      path: '/knowledge', 
+      icon: isKnowledgeUnlocked ? GiBrain : MdLock, 
+      label: 'Knowledge',
+      locked: !isKnowledgeUnlocked
+    },
   ];
 
   useEffect(() => {
@@ -51,6 +58,7 @@ const Layout = () => {
     localStorage.setItem('upgradeCounts', JSON.stringify(upgradeCounts));
     localStorage.setItem('clickPower', clickPower.toString());
     localStorage.setItem('clickUpgradeCounts', JSON.stringify(clickUpgradeCounts));
+    // localStorage.clear();
   }, [stardust, sps, upgradeCounts, clickPower, clickUpgradeCounts]);
 
   useEffect(() => {
@@ -65,6 +73,12 @@ const Layout = () => {
       setSps(prevSps => prevSps + upgrade.sps);
       setUpgradeCounts(prev => ({ ...prev, [upgrade.name]: (prev[upgrade.name] || 0) + 1 }));
     }
+  };
+
+  const handleNavigation = (path, locked) => {
+    if (!locked) {
+      navigate(path);
+    } 
   };
 
   return (
@@ -98,20 +112,22 @@ const Layout = () => {
           <Outlet />
         </main>
 
-
         <footer className="fixed bottom-0 left-0 right-0 bg-slate-950 p-4 shadow-inner z-50">
           <div className="flex justify-center space-x-4">
             {navButtons.map((button) => (
               <div key={button.path} className="relative group">
                 <button
-                  onClick={() => navigate(button.path)}
-                  className={`p-2 rounded-full ${location.pathname === button.path ? 'bg-blue-600' : 'bg-gray-700'} hover:bg-blue-500 transition-colors`}
+                  onClick={() => handleNavigation(button.path, button.locked)}
+                  className={`p-2 rounded-full 
+                    ${location.pathname === button.path ? 'bg-blue-600' : 'bg-gray-700'} 
+                    ${button.locked ? 'cursor-not-allowed' : 'hover:bg-blue-500'} 
+                    transition-colors`}
                   aria-label={button.label}
                 >
                   <button.icon size={24} />
                 </button>
                 <div className="absolute font-mp bg-opacity-60 bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                  {button.label}
+                  {button.locked ? `Locked: ${button.label}` : button.label}
                 </div>
               </div>
             ))}

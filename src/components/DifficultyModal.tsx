@@ -37,7 +37,7 @@ const DifficultyModal = ({ isOpen, onClose}) => {
           ))}
         </div>
         <p className="text-center text-gray-400 font-mp text-sm">
-          Difficulty affects research times? SPS? Clicks per second?
+          Difficulty affects research times? SPS? Clicks per second? 
         </p>
       </div>
     </div>

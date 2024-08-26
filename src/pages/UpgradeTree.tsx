@@ -5,11 +5,50 @@ import { useGameContext } from '../components/Layout';
 import { aminoAcid, nucleotide, lipid, rna, enzymes, vesicles, prokaryotic, eukaryotic, multicellular, fungi, plants, animals, human } from '../public/images';
 import DifficultyModal from '../components/DifficultyModal';
 
-const UpgradeSection = ({ title, upgrades, unlockCondition, tooltipText, isUnique }) => {
+const calculateUpgradeCost = (upgrade, count, tier) => {
+  let baseMultiplier;
+  switch(tier) {
+    case 'Basic':
+      baseMultiplier = 1.15;
+      break;
+    case 'Advanced':
+      baseMultiplier = 1.2;
+      break;
+    case 'Complex':
+      baseMultiplier = 1.25;
+      break;
+    case 'Diverse':
+      baseMultiplier = 1.3;
+      break;
+    case 'Sentient':
+      baseMultiplier = 1.35;
+      break;
+    default:
+      baseMultiplier = 1.15;
+  }
+
+  let adjustedMultiplier = baseMultiplier + (count * 0.01);
+  adjustedMultiplier = Math.min(adjustedMultiplier, 1.5);
+
+  return Math.floor(upgrade.baseCost * Math.pow(adjustedMultiplier, count));
+};
+
+const UpgradeSection = ({ title, upgrades, unlockCondition, tooltipText, isUnique, tier }) => {
   const { stardust, buyUpgrade, upgradeCounts } = useGameContext();
 
   const isUnlocked = unlockCondition(upgradeCounts);
 
+  const handleBuyUpgrade = (upgrade) => {
+    const count = upgradeCounts[upgrade.name] || 0;
+    const cost = calculateUpgradeCost(upgrade, count, tier);
+    if (stardust >= cost) {
+      buyUpgrade({
+        ...upgrade,
+        cost: cost,
+        nextCost: calculateUpgradeCost(upgrade, count + 1, tier)
+      });
+    }
+  };
 
   return (
     <div className={`bg-gray-700 p-4 rounded-lg mb-4 relative 
@@ -30,14 +69,14 @@ const UpgradeSection = ({ title, upgrades, unlockCondition, tooltipText, isUniqu
       <div className={`grid ${isUnique ? 'grid-cols-1 justify-items-center' : 'grid-cols-3'} gap-4`}>
         {upgrades.map(upgrade => {
           const count = upgradeCounts[upgrade.name] || 0;
-          const cost = Math.floor(upgrade.baseCost * Math.pow(1.15, count));
+          const cost = calculateUpgradeCost(upgrade, count, tier);
           const isUpgradeUnlocked = upgrade.unlockCondition ? upgrade.unlockCondition(upgradeCounts) : true;
           const canBuy = stardust >= cost && isUpgradeUnlocked;
 
           return (
             <div 
               key={upgrade.name} 
-              onClick={() => canBuy && buyUpgrade(upgrade)}
+              onClick={() => canBuy && handleBuyUpgrade(upgrade)}
               className={`bg-gray-900 p-4 rounded-lg flex flex-col items-center relative
                 ${canBuy ? 'cursor-pointer hover:bg-gray-800 active:bg-gray-600 transform active:scale-95 transition-all duration-100' : 'opacity-50 cursor-not-allowed'}
                 ${isUnique ? 'border-2 border-yellow-600 w-3/4 shadow-md shadow-yellow-600/50' : 'w-full'}
@@ -70,7 +109,6 @@ const UpgradeTree = () => {
     }
   }, [sps]);
 
-
   const upgradeTiers = [
     {
       title: "Basic Building Blocks",
@@ -80,7 +118,8 @@ const UpgradeTree = () => {
         { name: 'Lipids', baseCost: 1100, sps: 25, image: lipid },
       ],
       unlockCondition: () => true,
-      tooltipText: "Next tier requires 10 of each Basic Building Block"
+      tooltipText: "Next tier requires 10 of each Basic Building Block",
+      tier: 'Basic'
     },
     {
       title: "Advanced Structures",
@@ -90,7 +129,8 @@ const UpgradeTree = () => {
         { name: 'Vesicles', baseCost: 200000, sps: 8000, image: vesicles },
       ],
       unlockCondition: (counts) => ['Amino Acids', 'Nucleotides', 'Lipids'].every(u => (counts[u] || 0) >= 10),
-      tooltipText: "Next tier requires 10 of each Advanced Structure"
+      tooltipText: "Next tier requires 10 of each Advanced Structure",
+      tier: 'Advanced'
     },
     {
       title: "Complex Life Systems",
@@ -100,7 +140,8 @@ const UpgradeTree = () => {
         { name: 'Multicellular Organisms', baseCost: 5000000, sps: 60000, image: multicellular },
       ],
       unlockCondition: (counts) => ['RNA', 'Enzymes', 'Vesicles'].every(u => (counts[u] || 0) >= 10),
-      tooltipText: "Requires 10 of each Complex Life Systems"
+      tooltipText: "Requires 10 of each Complex Life Systems",
+      tier: 'Complex'
     }, 
     {
       title: "Diverse Life Forms",
@@ -110,7 +151,8 @@ const UpgradeTree = () => {
         { name: 'Animals', baseCost: 100000000, sps: 1000000, image: animals},
       ],
       unlockCondition: (counts) => ['Prokaryotic Cells', 'Eukaryotic Cells', 'Multicellular Organisms'].every(u => (counts[u] || 0) >= 10),
-      tooltipText: "Next tier requires 10 of each Diverse Life Form"
+      tooltipText: "Next tier requires 10 of each Diverse Life Form",
+      tier: 'Diverse'
     },
     {
       title: "Sentient Life",
@@ -119,7 +161,8 @@ const UpgradeTree = () => {
       ],
       unlockCondition: (counts) => ['Fungi', 'Plants', 'Animals'].every(u => (counts[u] || 0) >= 10),
       tooltipText: "The pinnacle of evolution",
-      isUnique: true 
+      isUnique: true,
+      tier: 'Sentient'
     }
   ];
 
@@ -134,6 +177,7 @@ const UpgradeTree = () => {
               isUnique={tier.isUnique}
               unlockCondition={tier.unlockCondition}
               tooltipText={tier.tooltipText}
+              tier={tier.tier}
             />
             {index < upgradeTiers.length - 1 && (
               <div className='flex justify-center my-2'>
@@ -151,7 +195,6 @@ const UpgradeTree = () => {
         isOpen={showDifficultyModal}
         onClose={() => setShowDifficultyModal(false)}
       />
-
     </div>
   );
 };

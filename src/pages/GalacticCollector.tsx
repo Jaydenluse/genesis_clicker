@@ -2,10 +2,10 @@ import React, { useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { MdOutlineArrowCircleRight, MdImage } from "react-icons/md";
 import { useGameContext } from '../components/Layout';
-import { stars, planet, collector, magnet, harvester } from '../public/images';
+import { stars, planet, collector, magnet, harvester} from '../public/images';
 
 const GalacticCollector = () => {
-  const { stardust, setStardust, clickPower, setClickPower, clickUpgradeCounts, setClickUpgradeCounts } = useGameContext();
+  const { stardust, setStardust, clickPower, setClickPower, clickUpgradeCounts, setClickUpgradeCounts, metaUpgradeCounts, setMetaUpgradeCounts } = useGameContext();
   const [surgeActive, setSurgeActive] = useState(false);
   const [clickEffects, setClickEffects] = useState([]);
   const [tooltipVisible, setTooltipVisible] = useState(null);
@@ -17,11 +17,16 @@ const GalacticCollector = () => {
     { name: 'Quantum Harvester', power: 20, baseCost: 1000, image: harvester },
   ];
 
+  const metaUpgrades = [
+    { name: 'Efficiency Booster', effect: 0.1, baseCost: 1000, image: collector },
+    { name: 'Offline Progress Enhancer', effect: 0.2, baseCost: 5000, image: magnet },
+    { name: 'Click Power Amplifier', effect: 0.15, baseCost: 2500, image: harvester },
+  ];
+
   const collectStardust = (e) => {
     const collected = surgeActive ? clickPower * 5 : clickPower;
     setStardust(prevStardust => prevStardust + collected);
 
-    // Create click effect
     const newEffect = {
       id: Date.now(),
       value: collected,
@@ -30,13 +35,12 @@ const GalacticCollector = () => {
     };
     setClickEffects(prev => [...prev, newEffect]);
 
-    // Remove effect after animation
     setTimeout(() => {
       setClickEffects(prev => prev.filter(effect => effect.id !== newEffect.id));
     }, 1000);
   };
 
-const buyClickUpgrade = (upgrade) => {
+  const buyClickUpgrade = (upgrade) => {
     const count = clickUpgradeCounts[upgrade.name];
     const cost = Math.floor(upgrade.baseCost * Math.pow(1.15, count));
     if (stardust >= cost) {
@@ -46,6 +50,18 @@ const buyClickUpgrade = (upgrade) => {
         [upgrade.name]: prev[upgrade.name] + 1
       }));
       setClickPower(prevPower => prevPower + upgrade.power);
+    }
+  };
+
+  const buyMetaUpgrade = (upgrade) => {
+    const count = metaUpgradeCounts[upgrade.name] || 0;
+    const cost = Math.floor(upgrade.baseCost * Math.pow(1.5, count));
+    if (stardust >= cost) {
+      setStardust(prevStardust => prevStardust - cost);
+      setMetaUpgradeCounts(prev => ({
+        ...prev,
+        [upgrade.name]: (prev[upgrade.name] || 0) + 1
+      }));
     }
   };
 
@@ -106,13 +122,13 @@ const buyClickUpgrade = (upgrade) => {
         </div>
       </div>
 
-
-      {/* Clicker Upgrades and Tooltip */}
+      {/* Upgrades and Tooltip */}
       <div className="w-64 bg-slate-950 p-4 font-mp flex flex-col relative">
+        {/* Clicker Upgrades */}
         <h2 className="text-2xl font-bold mb-4 text-white text-center">Click Upgrades</h2>
         <div className="grid grid-cols-2 gap-4">
           {clickUpgrades.map((upgrade) => {
-            const count = clickUpgradeCounts[upgrade.name];
+            const count = clickUpgradeCounts[upgrade.name] || 0;
             const cost = Math.floor(upgrade.baseCost * Math.pow(1.15, count));
             return (
               <div 
@@ -138,6 +154,36 @@ const buyClickUpgrade = (upgrade) => {
           })}
         </div>
 
+        {/* Meta Upgrades */}
+        <h2 className="text-2xl font-bold mb-4 mt-8 text-white text-center">Meta Upgrades</h2>
+        <div className="grid grid-cols-2 gap-4">
+          {metaUpgrades.map((upgrade) => {
+            const count = metaUpgradeCounts ? (metaUpgradeCounts[upgrade.name] || 0) : 0;
+            const cost = Math.floor(upgrade.baseCost * Math.pow(1.5, count));
+            return (
+              <div 
+                key={upgrade.name} 
+                className="relative group flex justify-center items-center"
+                onMouseEnter={() => handleMouseEnter(upgrade)}
+                onMouseLeave={handleMouseLeave}
+              >
+                <button
+                  onClick={() => buyMetaUpgrade(upgrade)}
+                  className="w-24 h-24 mt-2 rounded overflow-hidden focus:outline-none relative z-10"
+                  disabled={stardust < cost}
+                >
+                    <img 
+                      src={upgrade.image} 
+                      alt={upgrade.name} 
+                      className="w-full h-full object-cover object-center"
+                    /> 
+                </button>
+                <div className="absolute border border-purple-500 inset-0 h-28 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-200 rounded"></div>
+              </div>
+            );
+          })}
+        </div>
+
         {/* Tooltip Container */}
         <div 
           className={`absolute right-full top-0 m-2 w-48 bg-gray-800 p-2 rounded shadow-lg transition-all duration-200 ease-in-out ${
@@ -148,12 +194,27 @@ const buyClickUpgrade = (upgrade) => {
         >
           {clickUpgrades.map((upgrade) => {
             if (upgrade.name === tooltipVisible) {
-              const count = clickUpgradeCounts[upgrade.name];
+              const count = clickUpgradeCounts[upgrade.name] || 0;
               const cost = Math.floor(upgrade.baseCost * Math.pow(1.15, count));
               return (
                 <div key={upgrade.name} className="text-white">
                   <h3 className="text-lg font-semibold">{upgrade.name}</h3>
                   <p className="text-sm">Power: +{upgrade.power}</p>
+                  <p className="text-sm">Cost: {cost} Stardust</p>
+                  <p className="text-sm">Owned: {count}</p>
+                </div>
+              );
+            }
+            return null;
+          })}
+          {metaUpgrades.map((upgrade) => {
+            if (upgrade.name === tooltipVisible) {
+              const count = metaUpgradeCounts ? (metaUpgradeCounts[upgrade.name] || 0) : 0;
+              const cost = Math.floor(upgrade.baseCost * Math.pow(1.5, count));
+              return (
+                <div key={upgrade.name} className="text-white">
+                  <h3 className="text-lg font-semibold">{upgrade.name}</h3>
+                  <p className="text-sm">Effect: +{upgrade.effect * 100}%</p>
                   <p className="text-sm">Cost: {cost} Stardust</p>
                   <p className="text-sm">Owned: {count}</p>
                 </div>

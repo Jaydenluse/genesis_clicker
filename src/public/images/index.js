@@ -17,7 +17,10 @@ import fungi from './fungi.png';
 import plants from './plants.png';
 import animals from './animals.png';
 import human from './human.png';
+import organism from './organism.png';
+import atp from './atp.png'
 
 export { stars, planet, waterplanet, collector, magnet, harvester, aminoAcid,
      nucleotide, lipid, rna, enzymes, vesicles, prokaryotic, 
-     eukaryotic, multicellular, fungi, plants, animals, human };
+     eukaryotic, multicellular, fungi, plants, animals, human, organism,
+     atp };
